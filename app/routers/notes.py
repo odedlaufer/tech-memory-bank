@@ -30,5 +30,5 @@ def explain_note(title: str, db: Session = Depends(get_db)):
 
 
 @router.get("/search", response_model=List[schemas.NoteOut])
-def search_notes(tag: str, db: Session = Depends(get_db)):
-    return crud.search_notes_by_tag(db, tag=tag)
+def search_notes(tags: str, db: Session = Depends(get_db)):
+    return crud.search_notes_by_tags(db, tags=tags)
