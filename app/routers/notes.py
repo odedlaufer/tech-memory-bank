@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from .. import crud, schemas
 from ..database import SessionLocal
 from fastapi import HTTPException
+from typing import List
 
 router = APIRouter()
 
@@ -26,3 +27,8 @@ def explain_note(title: str, db: Session = Depends(get_db)):
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     return note
+
+
+@router.get("/search", response_model=List[schemas.NoteOut])
+def search_notes(tag: str, db: Session = Depends(get_db)):
+    return crud.search_notes_by_tag(db, tag=tag)
