@@ -12,3 +12,9 @@ def create_note(db: Session, note: schemas.NoteCreate):
 
 def get_note_by_title(db: Session, title: str):
     return db.query(models.Note).filter(models.Note.title == title).first()
+
+
+def search_notes_by_tag(db: Session, tag: str):
+    return db.query(
+        models.Note).filter(
+        models.Note.tags.ilike(f"%{tag}%")).all()
