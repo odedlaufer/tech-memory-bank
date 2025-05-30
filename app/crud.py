@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from . import models, schemas
 
 
@@ -14,7 +15,7 @@ def get_note_by_title(db: Session, title: str):
     return db.query(models.Note).filter(models.Note.title == title).first()
 
 
-def search_notes_by_tag(db: Session, tag: str):
-    return db.query(
-        models.Note).filter(
-        models.Note.tags.ilike(f"%{tag}%")).all()
+def search_notes_by_tags(db: Session, tags: str):
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()]
+    filters = [models.Note.tags.ilike(f"%{tag}%") for tag in tag_list]
+    return db.query(models.Note).filter(or_(*filters)).all()
