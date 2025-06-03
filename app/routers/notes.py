@@ -4,6 +4,8 @@ from .. import crud, schemas
 from ..database import SessionLocal
 from fastapi import HTTPException
 from typing import List
+from ..auth import get_current_user
+from ..models import User
 
 router = APIRouter()
 
@@ -17,8 +19,9 @@ def get_db():
 
 
 @router.post("/learn", response_model=schemas.NoteOut)
-def learn(note: schemas.NoteCreate, db: Session = Depends(get_db)):
-    return crud.create_note(db=db, note=note)
+def learn(note: schemas.NoteCreate, db: Session = Depends(get_db),
+          user: User = Depends(get_current_user)):
+    return crud.create_note(db=db, note=note, user_id=user.id)  # type: ignore
 
 
 @router.get("/explain/{title}", response_model=schemas.NoteOut)
@@ -32,3 +35,4 @@ def explain_note(title: str, db: Session = Depends(get_db)):
 @router.get("/search", response_model=List[schemas.NoteOut])
 def search_notes(tags: str, db: Session = Depends(get_db)):
     return crud.search_notes_by_tags(db, tags=tags)
+
