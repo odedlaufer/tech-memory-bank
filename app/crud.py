@@ -3,8 +3,8 @@ from sqlalchemy import or_
 from . import models, schemas
 
 
-def create_note(db: Session, note: schemas.NoteCreate):
-    db_note = models.Note(**note.dict())
+def create_note(db: Session, note: schemas.NoteCreate, user_id: int):
+    db_note = models.Note(**note.dict(), owner_id=user_id)
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
