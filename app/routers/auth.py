@@ -35,18 +35,12 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    # Query user by email (username)
-    db_user = db.query(models.User).filter(models.User.email == form_data.username).first()
 
-    # Explicit runtime and type check
+    db_user = db.query(models.User).filter(models.User.email == form_data.username).first()
     if db_user is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    # Check hashed password (must be a string here)
     if not auth.verify_password(form_data.password, db_user.hashed_password):  # type: ignore
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    # Create JWT token
     token = auth.create_access_token(data={"sub": str(db_user.id)})
 
     return {"access_token": token, "token_type": "bearer"}
