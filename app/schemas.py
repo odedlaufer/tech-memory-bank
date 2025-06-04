@@ -28,3 +28,9 @@ class NoteOut(NoteCreate):
 
     class Config:
         orm_mode = True
+
+
+class NoteUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    tags: Optional[str] = None

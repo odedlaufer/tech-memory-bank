@@ -43,3 +43,18 @@ def search_notes(tags: str, db: Session = Depends(get_db),
 def get_user_notes(db: Session = Depends(get_db), 
                    user: User = Depends(get_current_user)):
     return db.query(models.Note).filter(models.Note.owner_id == user.id).all()
+
+
+@router.put("/update/{note_id}", response_model=schemas.NoteOut)
+def update_note(note_id: int,
+                note_update: schemas.NoteUpdate,
+                db: Session = Depends(get_db),
+                user: User = Depends(get_current_user)):
+    
+    updated = crud.update_note(db=db, 
+                               note_id=note_id,  # type: ignore
+                               user_id=user.id,  # type: ignore
+                               updated_data=note_update)  # type: ignore
+    if not updated:
+        return HTTPException(status_code=404, detail="Note not found or unauthorized")
+    return updated
