@@ -5,7 +5,8 @@ from ..database import SessionLocal
 from fastapi import HTTPException
 from typing import List
 from ..auth import get_current_user
-from ..models import User, Note
+from ..models import User
+from ..utils.summarizer import summarize_text
 
 router = APIRouter()
 
@@ -51,10 +52,18 @@ def update_note(note_id: int,
                 db: Session = Depends(get_db),
                 user: User = Depends(get_current_user)):
     
-    updated = crud.update_note(db=db, 
+    updated = crud.update_note(db=db,
                                note_id=note_id,  # type: ignore
                                user_id=user.id,  # type: ignore
                                updated_data=note_update)  # type: ignore
     if not updated:
         return HTTPException(status_code=404, detail="Note not found or unauthorized")
     return updated
+
+
+@router.post("/summarize")
+def summarize_note_content(content: str, user: User = Depends(get_current_user)):
+    if len(content.split()) < 30:
+        raise HTTPException(status_code=400, detail="Content is too short to summarize")
+    summary = summarize_text(content)
+    return {"summary": summary}
